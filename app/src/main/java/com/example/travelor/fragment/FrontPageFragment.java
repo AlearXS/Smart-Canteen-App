@@ -1,5 +1,6 @@
 package com.example.travelor.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -141,6 +142,8 @@ public class FrontPageFragment extends Fragment{
         super.onResume();
         refreshDataFromDb();
         setLayout();
+        searchView.clearFocus();
+        searchView.setQuery(searchView.getQuery(), true);
     }
 
     // 更新视图
