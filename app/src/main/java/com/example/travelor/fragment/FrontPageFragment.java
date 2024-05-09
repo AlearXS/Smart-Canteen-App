@@ -117,7 +117,10 @@ public class FrontPageFragment extends Fragment{
     private void search() {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) { return false; }
+            public boolean onQueryTextSubmit(String query) {
+                performSearch(query);
+                return true;
+            }
 
             @Override
             public boolean onQueryTextChange(String newText) {
