@@ -1,10 +1,15 @@
 package com.example.travelor;
 
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,16 +17,23 @@ import android.widget.VideoView;
 
 import com.example.travelor.adapter.ImagePagerAdapter;
 import com.example.travelor.bean.Canteen;
+import com.example.travelor.datebase.CanteenDbOpenHelper;
+import com.example.travelor.fragment.AnnouncementEditDialogFragment;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.viewpager.widget.ViewPager;
 
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
-public class MonitoringActivity extends AppCompatActivity {
+public class MonitoringActivity extends AppCompatActivity implements AnnouncementEditDialogFragment.AnnouncementEditDialogListener {
 
     private Canteen canteen;
     private TextView canteenName;
@@ -29,6 +41,7 @@ public class MonitoringActivity extends AppCompatActivity {
     private TextView announcement;
     private TextView currentState;
     private ViewPager viewPager;
+    private Button announcementEditButton;
     private View locationIcon;
     private List<Integer> imageList;
     private ArrayList<View> dots = new ArrayList<>();
@@ -50,9 +63,16 @@ public class MonitoringActivity extends AppCompatActivity {
         initAnnouncement();
         initLocationIcon();
         initVideoPlayer();
-
+        initAnnouncementEditButton();
     }
 
+    private void initAnnouncementEditButton() {
+        announcementEditButton = findViewById(R.id.announcement_edit_button);
+        announcementEditButton.setOnClickListener(button -> {
+            AnnouncementEditDialogFragment announcementEditDialogFragment = new AnnouncementEditDialogFragment();
+            announcementEditDialogFragment.show(getSupportFragmentManager(), "announcement_edit_dialog");
+        });
+    }
 
     private void initCurrentState() {
         currentState = findViewById(R.id.current_state);
@@ -84,6 +104,15 @@ public class MonitoringActivity extends AppCompatActivity {
 
     private void initCanteenItem() {
         canteen = (Canteen) getIntent().getSerializableExtra("canteenItem");
+        readCanteenFromDb();
+    }
+
+    private void readCanteenFromDb() {
+        CanteenDbOpenHelper.readAll(this).forEach(item -> {
+            if (item.getName().equals(canteen.getName())) {
+                canteen = item;
+            }
+        });
     }
 
     private void initCanteenNameView() {
@@ -179,4 +208,16 @@ public class MonitoringActivity extends AppCompatActivity {
             }
         });
     };
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog, String newAnnouncement) {
+        CanteenDbOpenHelper.updateAnnouncement(this, canteen.getName(), newAnnouncement);
+        announcement.setText(newAnnouncement);
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
+    }
+
 }

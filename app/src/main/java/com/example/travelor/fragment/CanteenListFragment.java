@@ -1,6 +1,8 @@
 package com.example.travelor.fragment;
 
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.travelor.R;
 import com.example.travelor.adapter.CanttenCardAdapter;
 import com.example.travelor.bean.Canteen;
+import com.example.travelor.datebase.CanteenDbOpenHelper;
 import com.example.travelor.service.Monitoring;
 
 import java.text.SimpleDateFormat;
@@ -53,17 +56,51 @@ public class CanteenListFragment extends Fragment {
     }
 
     private void initCanteenListView(View rootView) {
-        Resources res = getResources();
+        Cursor cursor = getCursor4CanteenDb();
         List<Canteen> canteenList4Test = new ArrayList<>();
-        canteenList4Test.add(new Canteen("荷园一餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.he1, null)));
-        canteenList4Test.add(new Canteen("荷园二餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.he2, null), "荷园二食堂将于五月一日休息，届时将暂停营业，请各位同学提前安排好就餐时间。"));
-        canteenList4Test.add(new Canteen("聚英园餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.jyj, null)));
-        canteenList4Test.add(new Canteen("风华园餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.fhy, null)));
+        insertCanteens(cursor, canteenList4Test);
+//        canteenList4Test.add(new Canteen("荷园一餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.he1, null)));
+//        canteenList4Test.add(new Canteen("荷园二餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.he2, null), "荷园二食堂将于五月一日休息，届时将暂停营业，请各位同学提前安排好就餐时间。"));
+//        canteenList4Test.add(new Canteen("聚英园餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.jyj, null)));
+//        canteenList4Test.add(new Canteen("风华园餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.fhy, null)));
         updateCanteenListInfoViaRemote(canteenList4Test);
+        setViewAndAdapter(rootView, canteenList4Test);
+    }
+
+    private void setViewAndAdapter(View rootView, List<Canteen> canteenList4Test) {
         RecyclerView canteenCardsRecycleView = rootView.findViewById(R.id.canteen_cards);
         canteenCardsRecycleView.setLayoutManager(new LinearLayoutManager(getContext()));
         canttenCardAdapter = new CanttenCardAdapter(getContext(), canteenList4Test);
         canteenCardsRecycleView.setAdapter(canttenCardAdapter);
+    }
+
+    private static void insertCanteens(Cursor cursor, List<Canteen> canteenList4Test) {
+        while(cursor.moveToNext()) {
+            canteenList4Test.add(
+                    new Canteen(
+                            cursor.getString(0),
+                            cursor.getString(1),
+                            cursor.getString(2),
+                            cursor.getString(3)
+                    )
+            );
+        }
+        cursor.close();
+    }
+
+    private Cursor getCursor4CanteenDb() {
+        CanteenDbOpenHelper canteenDbOpenHelper = new CanteenDbOpenHelper(getContext());
+        SQLiteDatabase canteenDb = canteenDbOpenHelper.getReadableDatabase();
+        Cursor cursor = canteenDb.query(
+                CanteenDbOpenHelper.CanteenEntry.TABLE_NAME,   // The table to query
+                null,             // The array of columns to return (pass null to get all)
+                null,              // The columns for the WHERE clause
+                null,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+        return cursor;
     }
 
     private void updateCanteenListInfoViaRemote(List<Canteen> canteenList4Test) {

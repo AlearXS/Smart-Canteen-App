@@ -13,12 +13,27 @@ public class Canteen implements Serializable {
     private String imageUrl;
     private transient Drawable canteenImage;
 
+    public Canteen(String name, String flowState, String announcement, String imageUrl) {
+        this.name = name;
+        this.flowState = flowState;
+        this.announcement = announcement;
+        this.imageUrl = imageUrl;
+    }
+
     public String getAnnouncement() {
         return announcement;
     }
 
     public void setAnnouncement(String announcement) {
         this.announcement = announcement;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Canteen(String name, String flowState, Drawable canteenImage) {
