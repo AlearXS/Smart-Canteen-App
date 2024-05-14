@@ -11,7 +11,7 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.example.travelor.adapter.ImagePagerAdapter;
-import com.example.travelor.bean.CanteenItem;
+import com.example.travelor.bean.Canteen;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
@@ -23,7 +23,7 @@ import java.util.List;
 
 public class MonitoringActivity extends AppCompatActivity {
 
-    private CanteenItem canteenItem;
+    private Canteen canteen;
     private TextView canteenName;
     private TextView flowState;
     private TextView announcement;
@@ -56,7 +56,7 @@ public class MonitoringActivity extends AppCompatActivity {
 
     private void initCurrentState() {
         currentState = findViewById(R.id.current_state);
-        currentState.setText(canteenItem.getFlowState());
+        currentState.setText(canteen.getFlowState());
     }
 
     private void initLocationIcon() {
@@ -67,28 +67,28 @@ public class MonitoringActivity extends AppCompatActivity {
     private void addListener2LocationIcon() {
         locationIcon.setOnClickListener(locationIcon -> {
             Intent intent = new Intent(this, GaodeMapActivity.class);
-            intent.putExtra("canteenItem", canteenItem);
+            intent.putExtra("canteenItem", canteen);
             this.startActivity(intent);
         });
     }
 
     private void initAnnouncement() {
         announcement = findViewById(R.id.announcement);
-        announcement.setText(canteenItem.getAnnouncement());
+        announcement.setText(canteen.getAnnouncement());
     }
 
     private void initFlowState() {
         flowState = findViewById(R.id.flow_state);
-        flowState.setText("流量状况: " + canteenItem.getFlowState());
+        flowState.setText("流量状况: " + canteen.getFlowState());
     }
 
     private void initCanteenItem() {
-        canteenItem = (CanteenItem) getIntent().getSerializableExtra("canteenItem");
+        canteen = (Canteen) getIntent().getSerializableExtra("canteenItem");
     }
 
     private void initCanteenNameView() {
         canteenName = findViewById(R.id.canteen_name);
-        canteenName.setText(canteenItem.getCanteenName());
+        canteenName.setText(canteen.getName());
     }
 
 

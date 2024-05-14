@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.travelor.R;
 import com.example.travelor.adapter.CanttenCardAdapter;
-import com.example.travelor.bean.CanteenItem;
+import com.example.travelor.bean.Canteen;
 import com.example.travelor.service.Monitoring;
 
 import java.text.SimpleDateFormat;
@@ -54,11 +54,11 @@ public class CanteenListFragment extends Fragment {
 
     private void initCanteenListView(View rootView) {
         Resources res = getResources();
-        List<CanteenItem> canteenList4Test = new ArrayList<>();
-        canteenList4Test.add(new CanteenItem("荷园一餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.he1, null)));
-        canteenList4Test.add(new CanteenItem("荷园二餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.he2, null), "荷园二食堂将于五月一日休息，届时将暂停营业，请各位同学提前安排好就餐时间。"));
-        canteenList4Test.add(new CanteenItem("聚英园餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.jyj, null)));
-        canteenList4Test.add(new CanteenItem("风华园餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.fhy, null)));
+        List<Canteen> canteenList4Test = new ArrayList<>();
+        canteenList4Test.add(new Canteen("荷园一餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.he1, null)));
+        canteenList4Test.add(new Canteen("荷园二餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.he2, null), "荷园二食堂将于五月一日休息，届时将暂停营业，请各位同学提前安排好就餐时间。"));
+        canteenList4Test.add(new Canteen("聚英园餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.jyj, null)));
+        canteenList4Test.add(new Canteen("风华园餐厅", "空闲", ResourcesCompat.getDrawable(res, R.drawable.fhy, null)));
         updateCanteenListInfoViaRemote(canteenList4Test);
         RecyclerView canteenCardsRecycleView = rootView.findViewById(R.id.canteen_cards);
         canteenCardsRecycleView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -66,15 +66,15 @@ public class CanteenListFragment extends Fragment {
         canteenCardsRecycleView.setAdapter(canttenCardAdapter);
     }
 
-    private void updateCanteenListInfoViaRemote(List<CanteenItem> canteenList4Test) {
+    private void updateCanteenListInfoViaRemote(List<Canteen> canteenList4Test) {
         for (int i = 0; i < canteenList4Test.size(); i++) {
-            CanteenItem canteenItem = canteenList4Test.get(i);
-            try2UpdateFlowStateViaRemote(canteenItem, i);
+            Canteen canteen = canteenList4Test.get(i);
+            try2UpdateFlowStateViaRemote(canteen, i);
         }
     }
 
-    private void try2UpdateFlowStateViaRemote(CanteenItem canteenItem, int position) {
-        monitoringGetService.getMonitoring(canteenItem.getCanteenName()).enqueue(new Callback<Monitoring.CanteenMonitoring>() {
+    private void try2UpdateFlowStateViaRemote(Canteen canteen, int position) {
+        monitoringGetService.getMonitoring(canteen.getName()).enqueue(new Callback<Monitoring.CanteenMonitoring>() {
             @Override
             public void onResponse(Call<Monitoring.CanteenMonitoring> call, Response<Monitoring.CanteenMonitoring> response) {
                 try2UpdateFlowState(response);
@@ -83,16 +83,16 @@ public class CanteenListFragment extends Fragment {
             private void try2UpdateFlowState(Response<Monitoring.CanteenMonitoring> response) {
                 Monitoring.CanteenMonitoring canteenMonitoring = response.body();
                 if (Objects.isNull(canteenMonitoring)) {
-                    Log.w("CanteenListFragment", String.format("Canteen (%s) monitoring info is null", canteenItem.getCanteenName()));
+                    Log.w("CanteenListFragment", String.format("Canteen (%s) monitoring info is null", canteen.getName()));
                     return;
                 }
-                canteenItem.setFlowState(canteenMonitoring.getState());
+                canteen.setFlowState(canteenMonitoring.getState());
                 canttenCardAdapter.notifyItemChanged(position);
             }
 
             @Override
             public void onFailure(Call<Monitoring.CanteenMonitoring> call, Throwable t) {
-                Log.e("CanteenListFragment", String.format("Can not retrieve canteen (%s) monitoring info from service: %s", canteenItem.getCanteenName(), t));
+                Log.e("CanteenListFragment", String.format("Can not retrieve canteen (%s) monitoring info from service: %s", canteen.getName(), t));
             }
         });
     }
