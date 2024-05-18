@@ -14,6 +14,10 @@ import com.example.travelor.bean.Canteen;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @Deprecated 现在食堂的动态数据全部从后端获取，食堂的前端数据库已经弃用。
+ */
+@Deprecated
 public class CanteenDbOpenHelper extends SQLiteOpenHelper {
 
     /* Inner class that defines the table contents */
